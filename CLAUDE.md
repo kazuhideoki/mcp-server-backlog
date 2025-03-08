@@ -21,7 +21,7 @@ npm run typecheck
 
 ## Code Style Guidelines
 
-- **Naming**: camelCase for variables/functions, PascalCase for classes
+- **Naming**: camelCase for variables/functions, PascalCase for classes, kebab-case for file names
 - **Imports**: Group imports by external libraries, then internal modules
 - **Formatting**: 2-space indentation, trailing commas in multiline objects/arrays
 - **Types**: Use TypeScript when possible, prefer strict typing
