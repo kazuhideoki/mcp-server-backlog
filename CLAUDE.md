@@ -1,21 +1,26 @@
 # CLAUDE.md
 
 ## Build & Development Commands
+
 ```bash
 # Install dependencies
 npm install
 
-# Run tests (not yet implemented)
-npm test
+# Run development server with ts-node
+npm run dev
 
-# Lint (add ESLint when needed)
-# npm run lint
+# Build TypeScript to JavaScript
+npm run build
 
-# Typecheck (add TypeScript when needed)
-# npm run typecheck
+# Run built JavaScript
+npm run start
+
+# Type check without emitting files
+npm run typecheck
 ```
 
 ## Code Style Guidelines
+
 - **Naming**: camelCase for variables/functions, PascalCase for classes
 - **Imports**: Group imports by external libraries, then internal modules
 - **Formatting**: 2-space indentation, trailing commas in multiline objects/arrays
@@ -24,4 +29,18 @@ npm test
 - **Documentation**: JSDoc for functions, inline comments for complex logic
 
 ## Project Structure
+
 This project uses the Model Context Protocol SDK. Follow its conventions when extending.
+
+```
+/
+├── src/           # TypeScript source files
+│   └── index.ts   # Main entry point
+├── dist/          # Compiled JavaScript output
+└── node_modules/  # Dependencies
+```
+
+## Git Rules
+
+- Commit messages can be in Japanese
+- Do not include signatures or meta information in commit messages ("Generated with..." phrases are unnecessary)
