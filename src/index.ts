@@ -17,7 +17,7 @@ server.tool("space-activities", async () => {
   );
 
   // Get recent updates with default parameters
-  const result = await backlog.getRecentUpdates();
+  const result = await backlog.getSpaceActivities();
 
   return {
     content: [{ type: "text", text: JSON.stringify(result) }],

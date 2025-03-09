@@ -14,7 +14,7 @@ async function main() {
     );
 
     // Get recent updates with default parameters
-    const recentUpdates = await backlog.getRecentUpdates();
+    const recentUpdates = await backlog.getSpaceActivities();
 
     console.log("Recent updates:");
     console.log(JSON.stringify(recentUpdates, null, 2));

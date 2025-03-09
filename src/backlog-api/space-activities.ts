@@ -33,7 +33,7 @@ export class BacklogSpaceActivities {
    * @param order Sort order (default: 'desc')
    * @returns Array of activity objects
    */
-  async getRecentUpdates({
+  async getSpaceActivities({
     activityTypeIds,
     minId,
     maxId,
