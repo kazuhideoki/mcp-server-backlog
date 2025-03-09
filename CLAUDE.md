@@ -48,3 +48,25 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 ## MCP Integration
 
 - **backlog**: Implement backlog functionality using MCP SDK
+
+## Backlog API Implementation
+
+### Implemented APIs
+
+| MCP Tool Name | Backlog API Endpoint | Description | Parameters |
+|---------------|---------------------|-------------|------------|
+| `space-activities` | GET /api/v2/space/activities | Returns recent updates in a space | `activityTypeIds`, `minId`, `maxId`, `count`, `order` |
+| `activity` | GET /api/v2/activities/:activityId | Gets specific activity by ID | `activityId` (required) |
+
+### Implementation Pattern
+
+For adding new Backlog API endpoints:
+
+1. Create a function in `src/backlog-api/` folder with appropriate naming
+2. Use consistent error handling with axios
+3. Register the API as an MCP tool in `src/index.ts`
+4. Follow the existing parameter passing patterns
+
+### API Documentation Reference
+
+Official Backlog API documentation: https://developer.nulab.com/docs/backlog/
