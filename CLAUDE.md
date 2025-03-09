@@ -44,6 +44,8 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 
 - Commit messages can be in Japanese
 - Do not include signatures or meta information in commit messages ("Generated with..." phrases are unnecessary)
+- Never commit changes without explicit user approval
+- Request confirmation before creating a commit, even if changes seem minor
 
 ## MCP Integration
 
