@@ -1,7 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import path from "path";
-import { BacklogSpaceActivities } from "./backlog-api/space-activities";
+import { getSpaceActivities } from "./backlog-api/space-activities";
+import { loadApiKey } from "./api-key-loader";
+
+const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 
 // Create an MCP server
 const server = new McpServer({
@@ -10,14 +13,7 @@ const server = new McpServer({
 });
 
 server.tool("space-activities", async () => {
-  const backlog = new BacklogSpaceActivities(
-    "yourstand",
-    path.join(__dirname, "../apikey"),
-    "com", // または 'com' などのドメイン
-  );
-
-  // Get recent updates with default parameters
-  const result = await backlog.getSpaceActivities();
+  const result = await getSpaceActivities(apikey, "yourstand.backlog.com", {});
 
   return {
     content: [{ type: "text", text: JSON.stringify(result) }],
