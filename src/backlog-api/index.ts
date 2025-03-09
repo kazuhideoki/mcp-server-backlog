@@ -1,1 +1,1 @@
-export * from './recent-updates';
+export * from "./space-activities";

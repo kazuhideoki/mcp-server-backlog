@@ -1,34 +1,28 @@
-import {
-  McpServer,
-  ResourceTemplate,
-} from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
+import path from "path";
+import { BacklogSpaceActivities } from "./backlog-api/space-activities";
 
 // Create an MCP server
 const server = new McpServer({
-  name: "Demo",
+  name: "Backlog",
   version: "1.0.0",
 });
 
-// Add an addition tool
-server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-  content: [{ type: "text", text: String(a + b) }],
-}));
+server.tool("space-activities", async () => {
+  const backlog = new BacklogSpaceActivities(
+    "yourstand",
+    path.join(__dirname, "../apikey"),
+    "com", // または 'com' などのドメイン
+  );
 
-// Add a dynamic greeting resource
-server.resource(
-  "greeting",
-  new ResourceTemplate("greeting://{name}", { list: undefined }),
-  async (uri, { name }) => ({
-    contents: [
-      {
-        uri: uri.href,
-        text: `Hello, ${name}!`,
-      },
-    ],
-  }),
-);
+  // Get recent updates with default parameters
+  const result = await backlog.getRecentUpdates();
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
 
 // Start receiving messages on stdin and sending messages on stdout
 const transport = new StdioServerTransport();

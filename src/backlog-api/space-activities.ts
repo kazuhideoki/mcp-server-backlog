@@ -1,10 +1,11 @@
 import axios from "axios";
 import { loadApiKey } from "../api-key-loader";
+import _ from "lodash";
 
 /**
- * Backlog API client for fetching recent updates
+ * スペース上で行われた最近の更新の一覧を取得します。
  */
-export class BacklogRecentUpdates {
+export class BacklogSpaceActivities {
   private apiKey: string;
   private baseUrl: string;
 
@@ -16,9 +17,10 @@ export class BacklogRecentUpdates {
   constructor(
     private spaceId: string,
     apiKeyPath: string,
-    private domain: string = 'jp'
+    private domain: string = "com",
   ) {
     this.apiKey = loadApiKey(apiKeyPath);
+    console.log("🟢 this.apiKey", this.apiKey);
     this.baseUrl = `https://${spaceId}.backlog.${domain}/api/v2`;
   }
 
@@ -45,29 +47,20 @@ export class BacklogRecentUpdates {
     order?: "desc" | "asc";
   } = {}) {
     try {
-      const params: Record<string, string | number | (string | number)[]> = {
-        apiKey: this.apiKey,
-      };
-
-      if (activityTypeIds && activityTypeIds.length > 0) {
-        params.activityTypeId = activityTypeIds;
-      }
-
-      if (minId !== undefined) {
-        params.minId = minId;
-      }
-
-      if (maxId !== undefined) {
-        params.maxId = maxId;
-      }
-
-      if (count !== undefined) {
-        params.count = Math.min(count, 100); // Backlog API limits to 100
-      }
-
-      if (order) {
-        params.order = order;
-      }
+      const params = _.omitBy(
+        {
+          apiKey: this.apiKey,
+          activityTypeId:
+            activityTypeIds && activityTypeIds.length > 0
+              ? activityTypeIds
+              : undefined,
+          maxId,
+          minId,
+          count,
+          order,
+        },
+        _.isNil,
+      );
 
       const response = await axios.get(`${this.baseUrl}/space/activities`, {
         params,

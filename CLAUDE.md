@@ -44,3 +44,7 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 
 - Commit messages can be in Japanese
 - Do not include signatures or meta information in commit messages ("Generated with..." phrases are unnecessary)
+
+## MCP Integration
+
+- **backlog**: Implement backlog functionality using MCP SDK
