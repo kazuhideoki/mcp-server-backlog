@@ -3,6 +3,9 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import path from "path";
 import { getSpaceActivities } from "./backlog-api/space-activities";
 import { getActivity } from "./backlog-api/activities";
+import { getSpaceLogo } from "./backlog-api/space-logo";
+import { getSpaceNotification } from "./backlog-api/space-notification";
+import { updateSpaceNotification } from "./backlog-api/update-space-notification";
 import { loadApiKey } from "./api-key-loader";
 import { z } from "zod";
 
@@ -40,6 +43,51 @@ server.tool(
       content: [{ type: "text", text: JSON.stringify(result) }],
     };
   },
+);
+
+// Space Logo Tool
+server.tool("space-logo", async () => {
+  const result = await getSpaceLogo(
+    apikey,
+    "yourstand.backlog.com"
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Space Notification Tool
+server.tool("space-notification", async () => {
+  const result = await getSpaceNotification(
+    apikey,
+    "yourstand.backlog.com"
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Update Space Notification Tool
+server.tool(
+  "update-space-notification",
+  { content: z.string() },
+  async (params: { content: string }) => {
+    if (!params.content) {
+      throw new Error("Notification content is required");
+    }
+
+    const result = await updateSpaceNotification(
+      apikey,
+      "yourstand.backlog.com",
+      params.content
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
 );
 
 // Start receiving messages on stdin and sending messages on stdout

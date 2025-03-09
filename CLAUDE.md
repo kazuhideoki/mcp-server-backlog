@@ -57,6 +57,9 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 |---------------|---------------------|-------------|------------|
 | `space-activities` | GET /api/v2/space/activities | Returns recent updates in a space | `activityTypeIds`, `minId`, `maxId`, `count`, `order` |
 | `activity` | GET /api/v2/activities/:activityId | Gets specific activity by ID | `activityId` (required) |
+| `space-logo` | GET /api/v2/space/image | Gets the space logo image | None |
+| `space-notification` | GET /api/v2/space/notification | Gets the space notification | None |
+| `update-space-notification` | PUT /api/v2/space/notification | Updates the space notification | `content` (required) |
 
 ### Implementation Pattern
 
