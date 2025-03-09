@@ -22,6 +22,11 @@ import { getUserIcon } from "./backlog-api/get-user-icon";
 import { getUserRecentUpdates } from "./backlog-api/get-user-recent-updates";
 import { getReceivedStarList } from "./backlog-api/get-received-star-list";
 import { countUserReceivedStars } from "./backlog-api/count-user-received-stars";
+import { getRecentlyViewedIssues } from "./backlog-api/get-recently-viewed-issues";
+import { addRecentlyViewedIssue } from "./backlog-api/add-recently-viewed-issue";
+import { getRecentlyViewedProjects } from "./backlog-api/get-recently-viewed-projects";
+import { getRecentlyViewedWikis } from "./backlog-api/get-recently-viewed-wikis";
+import { addRecentlyViewedWiki } from "./backlog-api/add-recently-viewed-wiki";
 import { loadApiKey } from "./api-key-loader";
 import { z } from "zod";
 
@@ -531,6 +536,123 @@ server.tool(
       baseUrl,
       userId,
       options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Recently Viewed Issues Tool
+server.tool(
+  "recently-viewed-issues",
+  { 
+    order: z.enum(["desc", "asc"]).optional(),
+    offset: z.number().optional(),
+    count: z.number().optional()
+  },
+  async (params: { 
+    order?: "desc" | "asc";
+    offset?: number;
+    count?: number;
+  }) => {
+    const result = await getRecentlyViewedIssues(
+      apikey,
+      baseUrl,
+      params
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Recently Viewed Issue Tool
+server.tool(
+  "add-recently-viewed-issue",
+  { issueId: z.union([z.string(), z.number()]) },
+  async (params: { issueId: string | number }) => {
+    if (!params.issueId) {
+      throw new Error("Issue ID is required");
+    }
+
+    const result = await addRecentlyViewedIssue(
+      apikey,
+      baseUrl,
+      params.issueId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Recently Viewed Projects Tool
+server.tool(
+  "recently-viewed-projects",
+  { 
+    order: z.enum(["desc", "asc"]).optional(),
+    offset: z.number().optional(),
+    count: z.number().optional()
+  },
+  async (params: { 
+    order?: "desc" | "asc";
+    offset?: number;
+    count?: number;
+  }) => {
+    const result = await getRecentlyViewedProjects(
+      apikey,
+      baseUrl,
+      params
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Recently Viewed Wikis Tool
+server.tool(
+  "recently-viewed-wikis",
+  { 
+    order: z.enum(["desc", "asc"]).optional(),
+    offset: z.number().optional(),
+    count: z.number().optional()
+  },
+  async (params: { 
+    order?: "desc" | "asc";
+    offset?: number;
+    count?: number;
+  }) => {
+    const result = await getRecentlyViewedWikis(
+      apikey,
+      baseUrl,
+      params
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Recently Viewed Wiki Tool
+server.tool(
+  "add-recently-viewed-wiki",
+  { wikiId: z.union([z.string(), z.number()]) },
+  async (params: { wikiId: string | number }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await addRecentlyViewedWiki(
+      apikey,
+      baseUrl,
+      params.wikiId
     );
 
     return {

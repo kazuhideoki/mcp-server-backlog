@@ -76,6 +76,11 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 | `issues` | GET /api/v2/issues | Gets list of issues | `projectId` (optional), `statusId` (optional), `assigneeId` (optional), `count` (optional), `offset` (optional) |
 | `create-issue` | POST /api/v2/issues | Creates a new issue | `projectId` (required), `summary` (required), `issueTypeId` (required), `priorityId` (required), `description` (optional), `startDate` (optional), `dueDate` (optional), `assigneeId` (optional) |
 | `update-issue` | PATCH /api/v2/issues/:issueId | Updates an existing issue | `issueId` (required), `summary` (optional), `description` (optional), `statusId` (optional), `priorityId` (optional), `assigneeId` (optional), `startDate` (optional), `dueDate` (optional) |
+| `recently-viewed-issues` | GET /api/v2/users/myself/recentlyViewedIssues | Gets list of recently viewed issues | `order` (optional), `offset` (optional), `count` (optional) |
+| `add-recently-viewed-issue` | POST /api/v2/users/myself/recentlyViewedIssues | Adds an issue to recently viewed issues | `issueId` (required) |
+| `recently-viewed-projects` | GET /api/v2/users/myself/recentlyViewedProjects | Gets list of recently viewed projects | `order` (optional), `offset` (optional), `count` (optional) |
+| `recently-viewed-wikis` | GET /api/v2/users/myself/recentlyViewedWikis | Gets list of recently viewed wikis | `order` (optional), `offset` (optional), `count` (optional) |
+| `add-recently-viewed-wiki` | POST /api/v2/users/myself/recentlyViewedWikis | Adds a wiki to recently viewed wikis | `wikiId` (required) |
 
 ### Implementation Pattern
 
