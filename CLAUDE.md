@@ -61,9 +61,17 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 | `space-notification` | GET /api/v2/space/notification | Gets the space notification | None |
 | `update-space-notification` | PUT /api/v2/space/notification | Updates the space notification | `content` (required) |
 | `space-disk-usage` | GET /api/v2/space/diskUsage | Gets information about disk usage in the space | None |
+| `post-attachment-file` | POST /api/v2/space/attachment | Posts an attachment file to Backlog | `filePath` (required) |
 | `users` | GET /api/v2/users | Gets list of users in the space | None |
 | `user` | GET /api/v2/users/:userId | Gets information about a specific user | `userId` (required) |
+| `add-user` | POST /api/v2/users | Adds a new user to the space | `userId` (required), `password` (required), `name` (required), `mailAddress` (optional), `roleType` (optional) |
+| `update-user` | PATCH /api/v2/users/:userId | Updates an existing user | `userId` (required), `password` (optional), `name` (optional), `mailAddress` (optional), `roleType` (optional) |
 | `delete-user` | DELETE /api/v2/users/:userId | Deletes a user in the space | `userId` (required) |
+| `own-user` | GET /api/v2/users/myself | Gets information about the authenticated user | None |
+| `user-icon` | GET /api/v2/users/:userId/icon | Gets the icon of a specified user | `userId` (required) |
+| `user-recent-updates` | GET /api/v2/users/:userId/activities | Gets list of recent updates by the specified user | `userId` (required), `activityTypeIds` (optional), `count` (optional), `order` (optional) |
+| `received-star-list` | GET /api/v2/users/:userId/stars | Gets list of stars received by the specified user | `userId` (required), `minId` (optional), `maxId` (optional), `count` (optional), `order` (optional) |
+| `count-received-stars` | GET /api/v2/users/:userId/stars/count | Counts stars received by the specified user | `userId` (required), `since` (optional), `until` (optional) |
 | `projects` | GET /api/v2/projects | Gets list of projects in the space | `archived` (optional), `all` (optional) |
 | `issues` | GET /api/v2/issues | Gets list of issues | `projectId` (optional), `statusId` (optional), `assigneeId` (optional), `count` (optional), `offset` (optional) |
 | `create-issue` | POST /api/v2/issues | Creates a new issue | `projectId` (required), `summary` (required), `issueTypeId` (required), `priorityId` (required), `description` (optional), `startDate` (optional), `dueDate` (optional), `assigneeId` (optional) |

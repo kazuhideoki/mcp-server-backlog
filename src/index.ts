@@ -14,6 +14,14 @@ import { getProjects } from "./backlog-api/get-projects";
 import { getIssues } from "./backlog-api/get-issues";
 import { createIssue } from "./backlog-api/create-issue";
 import { updateIssue } from "./backlog-api/update-issue";
+import { postAttachmentFile } from "./backlog-api/post-attachment-file";
+import { addUser } from "./backlog-api/add-user";
+import { updateUser } from "./backlog-api/update-user";
+import { getOwnUser } from "./backlog-api/get-own-user";
+import { getUserIcon } from "./backlog-api/get-user-icon";
+import { getUserRecentUpdates } from "./backlog-api/get-user-recent-updates";
+import { getReceivedStarList } from "./backlog-api/get-received-star-list";
+import { countUserReceivedStars } from "./backlog-api/count-user-received-stars";
 import { loadApiKey } from "./api-key-loader";
 import { z } from "zod";
 
@@ -293,6 +301,236 @@ server.tool(
       baseUrl,
       issueId,
       updateParams
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Post Attachment File Tool
+server.tool(
+  "post-attachment-file",
+  { filePath: z.string() },
+  async (params: { filePath: string }) => {
+    if (!params.filePath) {
+      throw new Error("File path is required");
+    }
+
+    const result = await postAttachmentFile(
+      apikey,
+      baseUrl,
+      params.filePath
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add User Tool
+server.tool(
+  "add-user",
+  { 
+    userId: z.string(),
+    password: z.string(),
+    name: z.string(),
+    mailAddress: z.string().optional(),
+    roleType: z.number().optional()
+  },
+  async (params: { 
+    userId: string;
+    password: string;
+    name: string;
+    mailAddress?: string;
+    roleType?: number;
+  }) => {
+    if (!params.userId || !params.password || !params.name) {
+      throw new Error("User ID, password, and name are required");
+    }
+
+    const { userId, password, name, ...options } = params;
+
+    const result = await addUser(
+      apikey,
+      baseUrl,
+      userId,
+      password,
+      name,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update User Tool
+server.tool(
+  "update-user",
+  { 
+    userId: z.number(),
+    password: z.string().optional(),
+    name: z.string().optional(),
+    mailAddress: z.string().optional(),
+    roleType: z.number().optional()
+  },
+  async (params: { 
+    userId: number;
+    password?: string;
+    name?: string;
+    mailAddress?: string;
+    roleType?: number;
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...updateParams } = params;
+
+    const result = await updateUser(
+      apikey,
+      baseUrl,
+      userId,
+      updateParams
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Own User Tool
+server.tool("own-user", async () => {
+  const result = await getOwnUser(
+    apikey,
+    baseUrl
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Get User Icon Tool
+server.tool(
+  "user-icon",
+  { userId: z.number() },
+  async (params: { userId: number }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const result = await getUserIcon(
+      apikey,
+      baseUrl,
+      params.userId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get User Recent Updates Tool
+server.tool(
+  "user-recent-updates",
+  { 
+    userId: z.number(),
+    activityTypeIds: z.array(z.number()).optional(),
+    count: z.number().optional(),
+    order: z.enum(["desc", "asc"]).optional()
+  },
+  async (params: { 
+    userId: number;
+    activityTypeIds?: number[];
+    count?: number;
+    order?: "desc" | "asc";
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...options } = params;
+
+    const result = await getUserRecentUpdates(
+      apikey,
+      baseUrl,
+      userId,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Received Star List Tool
+server.tool(
+  "received-star-list",
+  { 
+    userId: z.number(),
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["desc", "asc"]).optional()
+  },
+  async (params: { 
+    userId: number;
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "desc" | "asc";
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...options } = params;
+
+    const result = await getReceivedStarList(
+      apikey,
+      baseUrl,
+      userId,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Count User Received Stars Tool
+server.tool(
+  "count-received-stars",
+  { 
+    userId: z.number(),
+    since: z.string().optional(),
+    until: z.string().optional()
+  },
+  async (params: { 
+    userId: number;
+    since?: string;
+    until?: string;
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...options } = params;
+
+    const result = await countUserReceivedStars(
+      apikey,
+      baseUrl,
+      userId,
+      options
     );
 
     return {
