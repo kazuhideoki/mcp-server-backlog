@@ -60,6 +60,14 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 | `space-logo` | GET /api/v2/space/image | Gets the space logo image | None |
 | `space-notification` | GET /api/v2/space/notification | Gets the space notification | None |
 | `update-space-notification` | PUT /api/v2/space/notification | Updates the space notification | `content` (required) |
+| `space-disk-usage` | GET /api/v2/space/diskUsage | Gets information about disk usage in the space | None |
+| `users` | GET /api/v2/users | Gets list of users in the space | None |
+| `user` | GET /api/v2/users/:userId | Gets information about a specific user | `userId` (required) |
+| `delete-user` | DELETE /api/v2/users/:userId | Deletes a user in the space | `userId` (required) |
+| `projects` | GET /api/v2/projects | Gets list of projects in the space | `archived` (optional), `all` (optional) |
+| `issues` | GET /api/v2/issues | Gets list of issues | `projectId` (optional), `statusId` (optional), `assigneeId` (optional), `count` (optional), `offset` (optional) |
+| `create-issue` | POST /api/v2/issues | Creates a new issue | `projectId` (required), `summary` (required), `issueTypeId` (required), `priorityId` (required), `description` (optional), `startDate` (optional), `dueDate` (optional), `assigneeId` (optional) |
+| `update-issue` | PATCH /api/v2/issues/:issueId | Updates an existing issue | `issueId` (required), `summary` (optional), `description` (optional), `statusId` (optional), `priorityId` (optional), `assigneeId` (optional), `startDate` (optional), `dueDate` (optional) |
 
 ### Implementation Pattern
 
