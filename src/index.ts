@@ -29,6 +29,18 @@ import { getRecentlyViewedWikis } from "./backlog-api/get-recently-viewed-wikis"
 import { addRecentlyViewedWiki } from "./backlog-api/add-recently-viewed-wiki";
 import { loadApiKey } from "./api-key-loader";
 import { z } from "zod";
+import { getStatusList } from "./backlog-api/get-status-list";
+import { getPriorityList } from "./backlog-api/get-priority-list";
+import { getResolutionList } from "./backlog-api/get-resolution-list";
+import { getProject } from "./backlog-api/get-project";
+import { addProject } from "./backlog-api/add-project";
+import { updateProject } from "./backlog-api/update-project";
+import { deleteProject } from "./backlog-api/delete-project";
+import { getProjectIcon } from "./backlog-api/get-project-icon";
+import { getProjectRecentUpdates } from "./backlog-api/get-project-recent-updates";
+import { addProjectUser } from "./backlog-api/add-project-user";
+import { getProjectUserList } from "./backlog-api/get-project-user-list";
+import { deleteProjectUser } from "./backlog-api/delete-project-user";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -653,6 +665,321 @@ server.tool(
       apikey,
       baseUrl,
       params.wikiId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Status List of Project Tool
+server.tool(
+  "project-status-list",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getStatusList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Priority List Tool
+server.tool("priority-list", async () => {
+  const result = await getPriorityList(
+    apikey,
+    baseUrl
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Get Resolution List Tool
+server.tool("resolution-list", async () => {
+  const result = await getResolutionList(
+    apikey,
+    baseUrl
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Get Project Tool
+server.tool(
+  "project",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getProject(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Project Tool
+server.tool(
+  "add-project",
+  {
+    name: z.string(),
+    key: z.string(),
+    chartEnabled: z.boolean(),
+    textFormattingRule: z.enum(["backlog", "markdown"]).optional(),
+    projectLeaderCanEditProjectLeader: z.boolean().optional(),
+    subtaskingEnabled: z.boolean().optional(),
+    externalLinks: z.array(z.string()).optional()
+  },
+  async (params: {
+    name: string;
+    key: string;
+    chartEnabled: boolean;
+    textFormattingRule?: "backlog" | "markdown";
+    projectLeaderCanEditProjectLeader?: boolean;
+    subtaskingEnabled?: boolean;
+    externalLinks?: string[];
+  }) => {
+    if (!params.name || !params.key) {
+      throw new Error("Project name and key are required");
+    }
+
+    const { name, key, chartEnabled, ...options } = params;
+
+    const result = await addProject(
+      apikey,
+      baseUrl,
+      name,
+      key,
+      chartEnabled,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Project Tool
+server.tool(
+  "update-project",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string().optional(),
+    key: z.string().optional(),
+    chartEnabled: z.boolean().optional(),
+    subtaskingEnabled: z.boolean().optional(),
+    projectLeaderCanEditProjectLeader: z.boolean().optional(),
+    textFormattingRule: z.enum(["backlog", "markdown"]).optional(),
+    archived: z.boolean().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name?: string;
+    key?: string;
+    chartEnabled?: boolean;
+    subtaskingEnabled?: boolean;
+    projectLeaderCanEditProjectLeader?: boolean;
+    textFormattingRule?: "backlog" | "markdown";
+    archived?: boolean;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const { projectIdOrKey, ...updateParams } = params;
+
+    const result = await updateProject(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      updateParams
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Project Tool
+server.tool(
+  "delete-project",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await deleteProject(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Project Icon Tool
+server.tool(
+  "project-icon",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getProjectIcon(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Project Recent Updates Tool
+server.tool(
+  "project-recent-updates",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    activityTypeIds: z.array(z.number()).optional(),
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["desc", "asc"]).optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    activityTypeIds?: number[];
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "desc" | "asc";
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const { projectIdOrKey, ...options } = params;
+
+    const result = await getProjectRecentUpdates(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Project User Tool
+server.tool(
+  "add-project-user",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    userId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    userId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const result = await addProjectUser(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.userId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Project User List Tool
+server.tool(
+  "project-users",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getProjectUserList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Project User Tool
+server.tool(
+  "delete-project-user",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    userId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    userId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const result = await deleteProjectUser(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.userId
     );
 
     return {
