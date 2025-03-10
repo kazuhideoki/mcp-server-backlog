@@ -1,18 +1,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import path from "path";
-import { getSpaceActivities } from "./backlog-api/space-activities";
-import { getActivity } from "./backlog-api/activities";
-import { getSpaceLogo } from "./backlog-api/space-logo";
-import { getSpaceNotification } from "./backlog-api/space-notification";
+import { getRecentUpdates } from "./backlog-api/get-recent-updates";
+import { getActivity } from "./backlog-api/get-activity";
+import { getSpaceLogo } from "./backlog-api/get-space-logo";
+import { getSpaceNotification } from "./backlog-api/get-space-notification";
 import { updateSpaceNotification } from "./backlog-api/update-space-notification";
-import { getSpaceDiskUsage } from "./backlog-api/space-disk-usage";
+import { getSpaceDiskUsage } from "./backlog-api/get-space-disk-usage";
 import { getUsers } from "./backlog-api/get-users";
 import { getUser } from "./backlog-api/get-user";
 import { deleteUser } from "./backlog-api/delete-user";
 import { getProjects } from "./backlog-api/get-projects";
 import { getIssues } from "./backlog-api/get-issues";
-import { createIssue } from "./backlog-api/create-issue";
+import { createIssue } from "./backlog-api/add-issue";
 import { updateIssue } from "./backlog-api/update-issue";
 import { postAttachmentFile } from "./backlog-api/post-attachment-file";
 import { addUser } from "./backlog-api/add-user";
@@ -22,10 +22,10 @@ import { getUserIcon } from "./backlog-api/get-user-icon";
 import { getUserRecentUpdates } from "./backlog-api/get-user-recent-updates";
 import { getReceivedStarList } from "./backlog-api/get-received-star-list";
 import { countUserReceivedStars } from "./backlog-api/count-user-received-stars";
-import { getRecentlyViewedIssues } from "./backlog-api/get-recently-viewed-issues";
+import { getRecentlyViewedIssues } from "./backlog-api/get-list-of-recently-viewed-issues";
 import { addRecentlyViewedIssue } from "./backlog-api/add-recently-viewed-issue";
-import { getRecentlyViewedProjects } from "./backlog-api/get-recently-viewed-projects";
-import { getRecentlyViewedWikis } from "./backlog-api/get-recently-viewed-wikis";
+import { getRecentlyViewedProjects } from "./backlog-api/get-list-of-recently-viewed-projects";
+import { getRecentlyViewedWikis } from "./backlog-api/get-list-of-recently-viewed-wikis";
 import { addRecentlyViewedWiki } from "./backlog-api/add-recently-viewed-wiki";
 import { loadApiKey } from "./api-key-loader";
 import { z } from "zod";
@@ -51,8 +51,8 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-server.tool("space-activities", async () => {
-  const result = await getSpaceActivities(apikey, baseUrl, {});
+server.tool("get-recent-updates", async () => {
+  const result = await getRecentUpdates(apikey, baseUrl, {});
 
   return {
     content: [{ type: "text", text: JSON.stringify(result) }],
@@ -60,7 +60,7 @@ server.tool("space-activities", async () => {
 });
 
 server.tool(
-  "activity",
+  "get-activity",
   { activityId: z.number() },
   async (params: { activityId: number }) => {
     if (!params.activityId) {
@@ -80,7 +80,7 @@ server.tool(
 );
 
 // Space Logo Tool
-server.tool("space-logo", async () => {
+server.tool("get-space-logo", async () => {
   const result = await getSpaceLogo(
     apikey,
     baseUrl
@@ -92,7 +92,7 @@ server.tool("space-logo", async () => {
 });
 
 // Space Notification Tool
-server.tool("space-notification", async () => {
+server.tool("get-space-notification", async () => {
   const result = await getSpaceNotification(
     apikey,
     baseUrl
@@ -125,7 +125,7 @@ server.tool(
 );
 
 // Space Disk Usage Tool
-server.tool("space-disk-usage", async () => {
+server.tool("get-space-disk-usage", async () => {
   const result = await getSpaceDiskUsage(
     apikey,
     baseUrl
@@ -212,7 +212,7 @@ server.tool(
 
 // Get Issues Tool
 server.tool(
-  "issues",
+  "get-issues",
   { 
     projectId: z.array(z.number()).optional(),
     statusId: z.array(z.number()).optional(),
@@ -241,7 +241,7 @@ server.tool(
 
 // Create Issue Tool
 server.tool(
-  "create-issue",
+  "add-issue",
   { 
     projectId: z.number(),
     summary: z.string(),
@@ -422,7 +422,7 @@ server.tool(
 );
 
 // Get Own User Tool
-server.tool("own-user", async () => {
+server.tool("get-own-user", async () => {
   const result = await getOwnUser(
     apikey,
     baseUrl
@@ -435,7 +435,7 @@ server.tool("own-user", async () => {
 
 // Get User Icon Tool
 server.tool(
-  "user-icon",
+  "get-user-icon",
   { userId: z.number() },
   async (params: { userId: number }) => {
     if (!params.userId) {
@@ -456,7 +456,7 @@ server.tool(
 
 // Get User Recent Updates Tool
 server.tool(
-  "user-recent-updates",
+  "get-user-recent-updates",
   { 
     userId: z.number(),
     activityTypeIds: z.array(z.number()).optional(),
@@ -490,7 +490,7 @@ server.tool(
 
 // Get Received Star List Tool
 server.tool(
-  "received-star-list",
+  "get-received-star-list",
   { 
     userId: z.number(),
     minId: z.number().optional(),
@@ -526,7 +526,7 @@ server.tool(
 
 // Count User Received Stars Tool
 server.tool(
-  "count-received-stars",
+  "count-user-received-stars",
   { 
     userId: z.number(),
     since: z.string().optional(),
@@ -558,7 +558,7 @@ server.tool(
 
 // Get Recently Viewed Issues Tool
 server.tool(
-  "recently-viewed-issues",
+  "get-list-of-recently-viewed-issues",
   { 
     order: z.enum(["desc", "asc"]).optional(),
     offset: z.number().optional(),
@@ -604,7 +604,7 @@ server.tool(
 
 // Get Recently Viewed Projects Tool
 server.tool(
-  "recently-viewed-projects",
+  "get-list-of-recently-viewed-projects",
   { 
     order: z.enum(["desc", "asc"]).optional(),
     offset: z.number().optional(),
@@ -629,7 +629,7 @@ server.tool(
 
 // Get Recently Viewed Wikis Tool
 server.tool(
-  "recently-viewed-wikis",
+  "get-list-of-recently-viewed-wikis",
   { 
     order: z.enum(["desc", "asc"]).optional(),
     offset: z.number().optional(),
@@ -675,7 +675,7 @@ server.tool(
 
 // Get Status List of Project Tool
 server.tool(
-  "project-status-list",
+  "get-status-list",
   { projectIdOrKey: z.union([z.string(), z.number()]) },
   async (params: { projectIdOrKey: string | number }) => {
     if (!params.projectIdOrKey) {
@@ -695,7 +695,7 @@ server.tool(
 );
 
 // Get Priority List Tool
-server.tool("priority-list", async () => {
+server.tool("get-priority-list", async () => {
   const result = await getPriorityList(
     apikey,
     baseUrl
@@ -707,7 +707,7 @@ server.tool("priority-list", async () => {
 });
 
 // Get Resolution List Tool
-server.tool("resolution-list", async () => {
+server.tool("get-resolution-list", async () => {
   const result = await getResolutionList(
     apikey,
     baseUrl
@@ -846,7 +846,7 @@ server.tool(
 
 // Get Project Icon Tool
 server.tool(
-  "project-icon",
+  "get-project-icon",
   { projectIdOrKey: z.union([z.string(), z.number()]) },
   async (params: { projectIdOrKey: string | number }) => {
     if (!params.projectIdOrKey) {
@@ -867,7 +867,7 @@ server.tool(
 
 // Get Project Recent Updates Tool
 server.tool(
-  "project-recent-updates",
+  "get-project-recent-updates",
   {
     projectIdOrKey: z.union([z.string(), z.number()]),
     activityTypeIds: z.array(z.number()).optional(),
@@ -937,7 +937,7 @@ server.tool(
 
 // Get Project User List Tool
 server.tool(
-  "project-users",
+  "get-project-user-list",
   { projectIdOrKey: z.union([z.string(), z.number()]) },
   async (params: { projectIdOrKey: string | number }) => {
     if (!params.projectIdOrKey) {

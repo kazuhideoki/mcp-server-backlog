@@ -13,7 +13,7 @@ import _ from "lodash";
  * @param baseUrl Override for the base URL
  * @returns Array of activity information
  */
-export async function getSpaceActivities(
+export async function getRecentUpdates(
   apiKey: string,
   baseUrl: string,
   options: {
