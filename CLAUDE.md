@@ -57,7 +57,7 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 
 | MCP Tool Name | Backlog API Endpoint | Description | Parameters | Documentation |
 |---------------|---------------------|-------------|------------|---------------|
-| `space-activities` | GET /api/v2/space/activities | Returns recent updates in a space | `activityTypeIds`, `minId`, `maxId`, `count`, `order` | [Link](https://developer.nulab.com/docs/backlog/api/2/get-space-activities) |
+| `space-activities` | GET /api/v2/space/activities | Returns recent updates in a space | `activityTypeIds`, `minId`, `maxId`, `count`, `order` | [Link](https://developer.nulab.com/docs/backlog/api/2/get-recent-updates) |
 | `activity` | GET /api/v2/activities/:activityId | Gets specific activity by ID | `activityId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-activity) |
 | `space-logo` | GET /api/v2/space/image | Gets the space logo image | None | [Link](https://developer.nulab.com/docs/backlog/api/2/get-space-logo) |
 | `space-notification` | GET /api/v2/space/notification | Gets the space notification | None | [Link](https://developer.nulab.com/docs/backlog/api/2/get-space-notification) |
@@ -126,4 +126,6 @@ To maintain consistency across the codebase, follow these naming conventions:
 
 ### API Documentation Reference
 
-Official Backlog API documentation: https://developer.nulab.com/docs/backlog/
+Official Backlog API documentation:
+- English: https://developer.nulab.com/docs/backlog/
+- Japanese: https://developer.nulab.com/ja/docs/backlog/
