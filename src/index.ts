@@ -41,6 +41,25 @@ import { getProjectRecentUpdates } from "./backlog-api/get-project-recent-update
 import { addProjectUser } from "./backlog-api/add-project-user";
 import { getProjectUserList } from "./backlog-api/get-project-user-list";
 import { deleteProjectUser } from "./backlog-api/delete-project-user";
+import { addProjectAdministrator } from "./backlog-api/add-project-administrator";
+import { getListOfProjectAdministrators } from "./backlog-api/get-list-of-project-administrators";
+import { deleteProjectAdministrator } from "./backlog-api/delete-project-administrator";
+import { addStatus } from "./backlog-api/add-status";
+import { updateStatus } from "./backlog-api/update-status";
+import { deleteStatus } from "./backlog-api/delete-status";
+import { updateOrderOfStatus } from "./backlog-api/update-order-of-status";
+import { getIssueTypeList } from "./backlog-api/get-issue-type-list";
+import { addIssueType } from "./backlog-api/add-issue-type";
+import { updateIssueType } from "./backlog-api/update-issue-type";
+import { deleteIssueType } from "./backlog-api/delete-issue-type";
+import { getCategoryList } from "./backlog-api/get-category-list";
+import { addCategory } from "./backlog-api/add-category";
+import { updateCategory } from "./backlog-api/update-category";
+import { deleteCategory } from "./backlog-api/delete-category";
+import { getVersionMilestoneList } from "./backlog-api/get-version-milestone-list";
+import { addVersionMilestone } from "./backlog-api/add-version-milestone";
+import { updateVersionMilestone } from "./backlog-api/update-version-milestone";
+import { deleteVersion } from "./backlog-api/delete-version";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -980,6 +999,661 @@ server.tool(
       baseUrl,
       params.projectIdOrKey,
       params.userId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Project Administrator Tool
+server.tool(
+  "add-project-administrator",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    userId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    userId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const result = await addProjectAdministrator(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.userId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Project Administrators Tool
+server.tool(
+  "get-list-of-project-administrators",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getListOfProjectAdministrators(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Project Administrator Tool
+server.tool(
+  "delete-project-administrator",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    userId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    userId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const result = await deleteProjectAdministrator(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.userId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Status Tool
+server.tool(
+  "add-status",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string(),
+    color: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name: string;
+    color: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Status name is required");
+    }
+
+    if (!params.color) {
+      throw new Error("Status color is required");
+    }
+
+    const result = await addStatus(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.name,
+      params.color
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Status Tool
+server.tool(
+  "update-status",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string(),
+    color: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name: string;
+    color: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Status ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Status name is required");
+    }
+
+    if (!params.color) {
+      throw new Error("Status color is required");
+    }
+
+    const result = await updateStatus(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.name,
+      params.color
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Status Tool
+server.tool(
+  "delete-status",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Status ID is required");
+    }
+
+    const result = await deleteStatus(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Order of Status Tool
+server.tool(
+  "update-order-of-status",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    statusIds: z.array(z.number())
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    statusIds: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.statusIds || params.statusIds.length === 0) {
+      throw new Error("Status IDs are required");
+    }
+
+    const result = await updateOrderOfStatus(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.statusIds
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Issue Type List Tool
+server.tool(
+  "get-issue-type-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getIssueTypeList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Issue Type Tool
+server.tool(
+  "add-issue-type",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string(),
+    color: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name: string;
+    color: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Issue type name is required");
+    }
+
+    if (!params.color) {
+      throw new Error("Issue type color is required");
+    }
+
+    const result = await addIssueType(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.name,
+      params.color
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Issue Type Tool
+server.tool(
+  "update-issue-type",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string(),
+    color: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name: string;
+    color: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Issue type ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Issue type name is required");
+    }
+
+    if (!params.color) {
+      throw new Error("Issue type color is required");
+    }
+
+    const result = await updateIssueType(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.name,
+      params.color
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Issue Type Tool
+server.tool(
+  "delete-issue-type",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Issue type ID is required");
+    }
+
+    const result = await deleteIssueType(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Category List Tool
+server.tool(
+  "get-category-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getCategoryList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Category Tool
+server.tool(
+  "add-category",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Category name is required");
+    }
+
+    const result = await addCategory(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.name
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Category Tool
+server.tool(
+  "update-category",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Category ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Category name is required");
+    }
+
+    const result = await updateCategory(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.name
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Category Tool
+server.tool(
+  "delete-category",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Category ID is required");
+    }
+
+    const result = await deleteCategory(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Version/Milestone List Tool
+server.tool(
+  "get-version-milestone-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getVersionMilestoneList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Version/Milestone Tool
+server.tool(
+  "add-version-milestone",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string(),
+    description: z.string().optional(),
+    startDate: z.string().optional(),
+    releaseDueDate: z.string().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name: string;
+    description?: string;
+    startDate?: string;
+    releaseDueDate?: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Version/milestone name is required");
+    }
+
+    const { projectIdOrKey, name, ...options } = params;
+
+    const result = await addVersionMilestone(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      name,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Version/Milestone Tool
+server.tool(
+  "update-version-milestone",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    startDate: z.string().optional(),
+    releaseDueDate: z.string().optional(),
+    archived: z.boolean().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name?: string;
+    description?: string;
+    startDate?: string;
+    releaseDueDate?: string;
+    archived?: boolean;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Version/milestone ID is required");
+    }
+
+    const { projectIdOrKey, id, ...options } = params;
+
+    if (Object.keys(options).length === 0) {
+      throw new Error("At least one parameter is required for update");
+    }
+
+    const result = await updateVersionMilestone(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      id,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Version Tool
+server.tool(
+  "delete-version",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Version/milestone ID is required");
+    }
+
+    const result = await deleteVersion(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id
     );
 
     return {
