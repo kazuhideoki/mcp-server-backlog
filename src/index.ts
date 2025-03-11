@@ -78,6 +78,21 @@ import { deleteWebhook } from "./backlog-api/delete-webhook";
 import { countIssue } from "./backlog-api/count-issue";
 import { getIssue } from "./backlog-api/get-issue";
 import { deleteIssue } from "./backlog-api/delete-issue";
+import { getCommentList } from "./backlog-api/get-comment-list";
+import { addComment } from "./backlog-api/add-comment";
+import { countComment } from "./backlog-api/count-comment";
+import { getComment } from "./backlog-api/get-comment";
+import { deleteComment } from "./backlog-api/delete-comment";
+import { updateComment } from "./backlog-api/update-comment";
+import { getListOfCommentNotifications } from "./backlog-api/get-list-of-comment-notifications";
+import { addCommentNotification } from "./backlog-api/add-comment-notification";
+import { getListOfIssueAttachments } from "./backlog-api/get-list-of-issue-attachments";
+import { getIssueAttachment } from "./backlog-api/get-issue-attachment";
+import { deleteIssueAttachment } from "./backlog-api/delete-issue-attachment";
+import { getIssueParticipantList } from "./backlog-api/get-issue-participant-list";
+import { getListOfLinkedSharedFiles } from "./backlog-api/get-list-of-linked-shared-files";
+import { linkSharedFilesToIssue } from "./backlog-api/link-shared-files-to-issue";
+import { removeLinkToSharedFileFromIssue } from "./backlog-api/remove-link-to-shared-file-from-issue";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -2375,6 +2390,486 @@ server.tool(
       apikey,
       baseUrl,
       params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Comment List Tool
+server.tool(
+  "get-comment-list",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["desc", "asc"]).optional()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "desc" | "asc";
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const { issueIdOrKey, ...options } = params;
+
+    const result = await getCommentList(
+      apikey,
+      baseUrl,
+      issueIdOrKey,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Comment Tool
+server.tool(
+  "add-comment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    content: z.string(),
+    notifiedUserId: z.array(z.number()).optional(),
+    attachmentId: z.array(z.number()).optional()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    content: string;
+    notifiedUserId?: number[];
+    attachmentId?: number[];
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.content) {
+      throw new Error("Comment content is required");
+    }
+
+    const { issueIdOrKey, content, ...options } = params;
+
+    const result = await addComment(
+      apikey,
+      baseUrl,
+      issueIdOrKey,
+      content,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Count Comment Tool
+server.tool(
+  "count-comment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await countComment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Comment Tool
+server.tool(
+  "get-comment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    commentId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    commentId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+
+    const result = await getComment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.commentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Comment Tool
+server.tool(
+  "delete-comment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    commentId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    commentId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+
+    const result = await deleteComment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.commentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Comment Tool
+server.tool(
+  "update-comment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    commentId: z.number(),
+    content: z.string()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    commentId: number;
+    content: string;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+
+    if (!params.content) {
+      throw new Error("Comment content is required");
+    }
+
+    const result = await updateComment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.commentId,
+      params.content
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Comment Notifications Tool
+server.tool(
+  "get-list-of-comment-notifications",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    commentId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    commentId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+
+    const result = await getListOfCommentNotifications(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.commentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Comment Notification Tool
+server.tool(
+  "add-comment-notification",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    commentId: z.number(),
+    notifiedUserIds: z.array(z.number())
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    commentId: number;
+    notifiedUserIds: number[];
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+
+    if (!params.notifiedUserIds || params.notifiedUserIds.length === 0) {
+      throw new Error("Notified user IDs are required");
+    }
+
+    const result = await addCommentNotification(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.commentId,
+      params.notifiedUserIds
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Issue Attachments Tool
+server.tool(
+  "get-list-of-issue-attachments",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await getListOfIssueAttachments(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Issue Attachment Tool
+server.tool(
+  "get-issue-attachment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    attachmentId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    attachmentId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+
+    const result = await getIssueAttachment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.attachmentId
+    );
+
+    // For binary data, we convert to base64 string
+    const base64 = Buffer.from(result).toString('base64');
+
+    return {
+      content: [{ type: "text", text: base64 }],
+    };
+  }
+);
+
+// Delete Issue Attachment Tool
+server.tool(
+  "delete-issue-attachment",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    attachmentId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    attachmentId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+
+    const result = await deleteIssueAttachment(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.attachmentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Issue Participant List Tool
+server.tool(
+  "get-issue-participant-list",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await getIssueParticipantList(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Linked Shared Files Tool
+server.tool(
+  "get-list-of-linked-shared-files",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await getListOfLinkedSharedFiles(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Link Shared Files to Issue Tool
+server.tool(
+  "link-shared-files-to-issue",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    fileIds: z.array(z.number())
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    fileIds: number[];
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.fileIds || params.fileIds.length === 0) {
+      throw new Error("File IDs are required");
+    }
+
+    const result = await linkSharedFilesToIssue(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.fileIds
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Remove Link to Shared File from Issue Tool
+server.tool(
+  "remove-link-to-shared-file-from-issue",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    fileId: z.number()
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+    fileId: number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    if (!params.fileId) {
+      throw new Error("File ID is required");
+    }
+
+    const result = await removeLinkToSharedFileFromIssue(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey,
+      params.fileId
     );
 
     return {
