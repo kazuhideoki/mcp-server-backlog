@@ -60,6 +60,15 @@ import { getVersionMilestoneList } from "./backlog-api/get-version-milestone-lis
 import { addVersionMilestone } from "./backlog-api/add-version-milestone";
 import { updateVersionMilestone } from "./backlog-api/update-version-milestone";
 import { deleteVersion } from "./backlog-api/delete-version";
+import { getCustomFieldList } from "./backlog-api/get-custom-field-list";
+import { addCustomField } from "./backlog-api/add-custom-field";
+import { updateCustomField } from "./backlog-api/update-custom-field";
+import { deleteCustomField } from "./backlog-api/delete-custom-field";
+import { addListItemForListTypeCustomField } from "./backlog-api/add-list-item-for-list-type-custom-field";
+import { updateListItemForListTypeCustomField } from "./backlog-api/update-list-item-for-list-type-custom-field";
+import { deleteListItemForListTypeCustomField } from "./backlog-api/delete-list-item-for-list-type-custom-field";
+import { getListOfSharedFiles } from "./backlog-api/get-list-of-shared-files";
+import { getFile } from "./backlog-api/get-file";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -1658,6 +1667,373 @@ server.tool(
 
     return {
       content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Custom Field List Tool
+server.tool(
+  "get-custom-field-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getCustomFieldList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Custom Field Tool
+server.tool(
+  "add-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    typeId: z.number(),
+    name: z.string(),
+    description: z.string().optional(),
+    required: z.boolean().optional(),
+    applicableIssueTypes: z.array(z.number()).optional(),
+    items: z.array(z.string()).optional(),
+    allowInput: z.boolean().optional(),
+    allowAddItem: z.boolean().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    initial: z.string().optional(),
+    unit: z.string().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    typeId: number;
+    name: string;
+    description?: string;
+    required?: boolean;
+    applicableIssueTypes?: number[];
+    items?: string[];
+    allowInput?: boolean;
+    allowAddItem?: boolean;
+    min?: number;
+    max?: number;
+    initial?: string;
+    unit?: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.typeId) {
+      throw new Error("Type ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Name is required");
+    }
+
+    const { projectIdOrKey, typeId, name, ...options } = params;
+
+    const result = await addCustomField(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      typeId,
+      name,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Custom Field Tool
+server.tool(
+  "update-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    required: z.boolean().optional(),
+    applicableIssueTypes: z.array(z.number()).optional(),
+    items: z.array(z.string()).optional(),
+    allowInput: z.boolean().optional(),
+    allowAddItem: z.boolean().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    initial: z.string().optional(),
+    unit: z.string().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name?: string;
+    description?: string;
+    required?: boolean;
+    applicableIssueTypes?: number[];
+    items?: string[];
+    allowInput?: boolean;
+    allowAddItem?: boolean;
+    min?: number;
+    max?: number;
+    initial?: string;
+    unit?: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Custom field ID is required");
+    }
+
+    const { projectIdOrKey, id, ...updateParams } = params;
+
+    if (Object.keys(updateParams).length === 0) {
+      throw new Error("At least one parameter is required for update");
+    }
+
+    const result = await updateCustomField(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      id,
+      updateParams
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Custom Field Tool
+server.tool(
+  "delete-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Custom field ID is required");
+    }
+
+    const result = await deleteCustomField(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add List Item for List Type Custom Field Tool
+server.tool(
+  "add-list-item-for-list-type-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    name: z.string()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    name: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Custom field ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Item name is required");
+    }
+
+    const result = await addListItemForListTypeCustomField(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.name
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update List Item for List Type Custom Field Tool
+server.tool(
+  "update-list-item-for-list-type-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    itemId: z.number(),
+    name: z.string()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    itemId: number;
+    name: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Custom field ID is required");
+    }
+
+    if (!params.itemId) {
+      throw new Error("Item ID is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Item name is required");
+    }
+
+    const result = await updateListItemForListTypeCustomField(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.itemId,
+      params.name
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete List Item for List Type Custom Field Tool
+server.tool(
+  "delete-list-item-for-list-type-custom-field",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    id: z.number(),
+    itemId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    id: number;
+    itemId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.id) {
+      throw new Error("Custom field ID is required");
+    }
+
+    if (!params.itemId) {
+      throw new Error("Item ID is required");
+    }
+
+    const result = await deleteListItemForListTypeCustomField(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.id,
+      params.itemId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Shared Files Tool
+server.tool(
+  "get-list-of-shared-files",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    path: z.string().optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    path?: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getListOfSharedFiles(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.path
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get File Tool
+server.tool(
+  "get-file",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    path: z.string()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    path: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.path) {
+      throw new Error("File path is required");
+    }
+
+    const result = await getFile(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.path
+    );
+
+    // For binary data, we convert to base64 string
+    const base64 = Buffer.from(result).toString('base64');
+
+    return {
+      content: [{ type: "text", text: base64 }],
     };
   }
 );
