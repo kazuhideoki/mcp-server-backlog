@@ -69,6 +69,15 @@ import { updateListItemForListTypeCustomField } from "./backlog-api/update-list-
 import { deleteListItemForListTypeCustomField } from "./backlog-api/delete-list-item-for-list-type-custom-field";
 import { getListOfSharedFiles } from "./backlog-api/get-list-of-shared-files";
 import { getFile } from "./backlog-api/get-file";
+import { getProjectDiskUsage } from "./backlog-api/get-project-disk-usage";
+import { getWebhookList } from "./backlog-api/get-webhook-list";
+import { addWebhook } from "./backlog-api/add-webhook";
+import { getWebhook } from "./backlog-api/get-webhook";
+import { updateWebhook } from "./backlog-api/update-webhook";
+import { deleteWebhook } from "./backlog-api/delete-webhook";
+import { countIssue } from "./backlog-api/count-issue";
+import { getIssue } from "./backlog-api/get-issue";
+import { deleteIssue } from "./backlog-api/delete-issue";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -2034,6 +2043,342 @@ server.tool(
 
     return {
       content: [{ type: "text", text: base64 }],
+    };
+  }
+);
+
+// Get Project Disk Usage Tool
+server.tool(
+  "get-project-disk-usage",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getProjectDiskUsage(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Webhook List Tool
+server.tool(
+  "get-webhook-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getWebhookList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Webhook Tool
+server.tool(
+  "add-webhook",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    name: z.string(),
+    hookUrl: z.string(),
+    description: z.string().optional(),
+    allEvent: z.boolean().optional(),
+    activityTypeIds: z.array(z.number()).optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    name: string;
+    hookUrl: string;
+    description?: string;
+    allEvent?: boolean;
+    activityTypeIds?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.name) {
+      throw new Error("Name is required");
+    }
+
+    if (!params.hookUrl) {
+      throw new Error("Hook URL is required");
+    }
+
+    const { projectIdOrKey, name, hookUrl, ...options } = params;
+
+    const result = await addWebhook(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      name,
+      hookUrl,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Webhook Tool
+server.tool(
+  "get-webhook",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    webhookId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    webhookId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.webhookId) {
+      throw new Error("Webhook ID is required");
+    }
+
+    const result = await getWebhook(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.webhookId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Webhook Tool
+server.tool(
+  "update-webhook",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    webhookId: z.number(),
+    name: z.string().optional(),
+    hookUrl: z.string().optional(),
+    description: z.string().optional(),
+    allEvent: z.boolean().optional(),
+    activityTypeIds: z.array(z.number()).optional()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    webhookId: number;
+    name?: string;
+    hookUrl?: string;
+    description?: string;
+    allEvent?: boolean;
+    activityTypeIds?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.webhookId) {
+      throw new Error("Webhook ID is required");
+    }
+
+    const { projectIdOrKey, webhookId, ...updateParams } = params;
+
+    if (Object.keys(updateParams).length === 0) {
+      throw new Error("At least one parameter is required for update");
+    }
+
+    const result = await updateWebhook(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      webhookId,
+      updateParams
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Webhook Tool
+server.tool(
+  "delete-webhook",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    webhookId: z.number()
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    webhookId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    if (!params.webhookId) {
+      throw new Error("Webhook ID is required");
+    }
+
+    const result = await deleteWebhook(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.webhookId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Count Issue Tool
+server.tool(
+  "count-issue",
+  {
+    projectId: z.array(z.number()).optional(),
+    issueTypeId: z.array(z.number()).optional(),
+    categoryId: z.array(z.number()).optional(),
+    versionId: z.array(z.number()).optional(),
+    milestoneId: z.array(z.number()).optional(),
+    statusId: z.array(z.number()).optional(),
+    priorityId: z.array(z.number()).optional(),
+    assigneeId: z.array(z.number()).optional(),
+    createdUserId: z.array(z.number()).optional(),
+    resolutionId: z.array(z.number()).optional(),
+    parentChild: z.number().optional(),
+    attachment: z.boolean().optional(),
+    sharedFile: z.boolean().optional(),
+    sort: z.string().optional(),
+    order: z.string().optional(),
+    count: z.number().optional(),
+    offset: z.number().optional(),
+    createdSince: z.string().optional(),
+    createdUntil: z.string().optional(),
+    updatedSince: z.string().optional(),
+    updatedUntil: z.string().optional(),
+    startDateSince: z.string().optional(),
+    startDateUntil: z.string().optional(),
+    dueDateSince: z.string().optional(),
+    dueDateUntil: z.string().optional(),
+    id: z.array(z.number()).optional(),
+    parentIssueId: z.array(z.number()).optional(),
+    keyword: z.string().optional()
+  },
+  async (params: {
+    projectId?: number[];
+    issueTypeId?: number[];
+    categoryId?: number[];
+    versionId?: number[];
+    milestoneId?: number[];
+    statusId?: number[];
+    priorityId?: number[];
+    assigneeId?: number[];
+    createdUserId?: number[];
+    resolutionId?: number[];
+    parentChild?: number;
+    attachment?: boolean;
+    sharedFile?: boolean;
+    sort?: string;
+    order?: string;
+    count?: number;
+    offset?: number;
+    createdSince?: string;
+    createdUntil?: string;
+    updatedSince?: string;
+    updatedUntil?: string;
+    startDateSince?: string;
+    startDateUntil?: string;
+    dueDateSince?: string;
+    dueDateUntil?: string;
+    id?: number[];
+    parentIssueId?: number[];
+    keyword?: string;
+  }) => {
+    const result = await countIssue(
+      apikey,
+      baseUrl,
+      params
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Issue Tool
+server.tool(
+  "get-issue",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await getIssue(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Issue Tool
+server.tool(
+  "delete-issue",
+  {
+    issueIdOrKey: z.union([z.string(), z.number()])
+  },
+  async (params: {
+    issueIdOrKey: string | number;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const result = await deleteIssue(
+      apikey,
+      baseUrl,
+      params.issueIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
     };
   }
 );
