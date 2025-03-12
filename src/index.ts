@@ -48,6 +48,24 @@ import { addStatus } from "./backlog-api/add-status";
 import { updateStatus } from "./backlog-api/update-status";
 import { deleteStatus } from "./backlog-api/delete-status";
 import { updateOrderOfStatus } from "./backlog-api/update-order-of-status";
+import { getWatchingList } from "./backlog-api/get-watching-list";
+import { countWatching } from "./backlog-api/count-watching";
+import { getWatching } from "./backlog-api/get-watching";
+import { addWatching } from "./backlog-api/add-watching";
+import { updateWatching } from "./backlog-api/update-watching";
+import { deleteWatching } from "./backlog-api/delete-watching";
+import { markWatchingAsRead } from "./backlog-api/mark-watching-as-read";
+import { getLicense } from "./backlog-api/get-license";
+import { getListOfTeams } from "./backlog-api/get-list-of-teams";
+import { addTeam } from "./backlog-api/add-team";
+import { getTeam } from "./backlog-api/get-team";
+import { updateTeam } from "./backlog-api/update-team";
+import { deleteTeam } from "./backlog-api/delete-team";
+import { getTeamIcon } from "./backlog-api/get-team-icon";
+import { getProjectTeamList } from "./backlog-api/get-project-team-list";
+import { addProjectTeam } from "./backlog-api/add-project-team";
+import { deleteProjectTeam } from "./backlog-api/delete-project-team";
+import { getRateLimit } from "./backlog-api/get-rate-limit";
 import { getIssueTypeList } from "./backlog-api/get-issue-type-list";
 import { addIssueType } from "./backlog-api/add-issue-type";
 import { updateIssueType } from "./backlog-api/update-issue-type";
@@ -4070,6 +4088,434 @@ server.tool(
     };
   },
 );
+
+// Watching APIs
+server.tool(
+  "get-watching-list",
+  { 
+    userId: z.number(),
+    count: z.number().optional(),
+    order: z.enum(["asc", "desc"]).optional(),
+    offset: z.number().optional(),
+    resourceAlreadyRead: z.boolean().optional(),
+    alreadyRead: z.boolean().optional()
+  },
+  async (params: { 
+    userId: number;
+    count?: number;
+    order?: "asc" | "desc";
+    offset?: number;
+    resourceAlreadyRead?: boolean;
+    alreadyRead?: boolean;
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...options } = params;
+
+    const result = await getWatchingList(
+      apikey,
+      baseUrl,
+      userId,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "count-watching",
+  { 
+    userId: z.number(),
+    resourceAlreadyRead: z.boolean().optional(),
+    alreadyRead: z.boolean().optional()
+  },
+  async (params: { 
+    userId: number;
+    resourceAlreadyRead?: boolean;
+    alreadyRead?: boolean;
+  }) => {
+    if (!params.userId) {
+      throw new Error("User ID is required");
+    }
+
+    const { userId, ...options } = params;
+
+    const result = await countWatching(
+      apikey,
+      baseUrl,
+      userId,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "get-watching",
+  { watchingId: z.number() },
+  async (params: { watchingId: number }) => {
+    if (!params.watchingId) {
+      throw new Error("Watching ID is required");
+    }
+
+    const result = await getWatching(
+      apikey,
+      baseUrl,
+      params.watchingId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "add-watching",
+  { 
+    issueIdOrKey: z.union([z.string(), z.number()]),
+    note: z.string().optional()
+  },
+  async (params: { 
+    issueIdOrKey: string | number;
+    note?: string;
+  }) => {
+    if (!params.issueIdOrKey) {
+      throw new Error("Issue ID or key is required");
+    }
+
+    const { issueIdOrKey, ...options } = params;
+
+    const result = await addWatching(
+      apikey,
+      baseUrl,
+      issueIdOrKey,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "update-watching",
+  { 
+    watchingId: z.number(),
+    note: z.string()
+  },
+  async (params: { 
+    watchingId: number;
+    note: string;
+  }) => {
+    if (!params.watchingId) {
+      throw new Error("Watching ID is required");
+    }
+    if (!params.note) {
+      throw new Error("Note is required");
+    }
+
+    const result = await updateWatching(
+      apikey,
+      baseUrl,
+      params.watchingId,
+      params.note
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "delete-watching",
+  { watchingId: z.number() },
+  async (params: { watchingId: number }) => {
+    if (!params.watchingId) {
+      throw new Error("Watching ID is required");
+    }
+
+    const result = await deleteWatching(
+      apikey,
+      baseUrl,
+      params.watchingId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "mark-watching-as-read",
+  { watchingId: z.number() },
+  async (params: { watchingId: number }) => {
+    if (!params.watchingId) {
+      throw new Error("Watching ID is required");
+    }
+
+    const result = await markWatchingAsRead(
+      apikey,
+      baseUrl,
+      params.watchingId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// License API
+server.tool("get-licence", async () => {
+  const result = await getLicense(apikey, baseUrl);
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Team APIs
+server.tool(
+  "get-list-of-teams",
+  { 
+    offset: z.number().optional(),
+    count: z.number().optional()
+  },
+  async (params: { 
+    offset?: number;
+    count?: number;
+  }) => {
+    const result = await getListOfTeams(
+      apikey,
+      baseUrl,
+      params
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "add-team",
+  { 
+    name: z.string(),
+    members: z.array(z.number()).optional()
+  },
+  async (params: { 
+    name: string;
+    members?: number[];
+  }) => {
+    if (!params.name) {
+      throw new Error("Team name is required");
+    }
+
+    const { name, ...options } = params;
+
+    const result = await addTeam(
+      apikey,
+      baseUrl,
+      name,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "get-team",
+  { teamId: z.number() },
+  async (params: { teamId: number }) => {
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const result = await getTeam(
+      apikey,
+      baseUrl,
+      params.teamId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "update-team",
+  { 
+    teamId: z.number(),
+    name: z.string().optional(),
+    members: z.array(z.number()).optional()
+  },
+  async (params: { 
+    teamId: number;
+    name?: string;
+    members?: number[];
+  }) => {
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const { teamId, ...options } = params;
+
+    const result = await updateTeam(
+      apikey,
+      baseUrl,
+      teamId,
+      options
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "delete-team",
+  { teamId: z.number() },
+  async (params: { teamId: number }) => {
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const result = await deleteTeam(
+      apikey,
+      baseUrl,
+      params.teamId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "get-team-icon",
+  { teamId: z.number() },
+  async (params: { teamId: number }) => {
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const result = await getTeamIcon(
+      apikey,
+      baseUrl,
+      params.teamId
+    );
+
+    return {
+      content: [{ type: "text", text: "Team icon data retrieved (binary data)" }],
+    };
+  }
+);
+
+server.tool(
+  "get-project-team-list",
+  { projectIdOrKey: z.union([z.string(), z.number()]) },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getProjectTeamList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "add-project-team",
+  { 
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    teamId: z.number()
+  },
+  async (params: { 
+    projectIdOrKey: string | number;
+    teamId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const result = await addProjectTeam(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.teamId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool(
+  "delete-project-team",
+  { 
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    teamId: z.number()
+  },
+  async (params: { 
+    projectIdOrKey: string | number;
+    teamId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.teamId) {
+      throw new Error("Team ID is required");
+    }
+
+    const result = await deleteProjectTeam(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.teamId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+server.tool("get-rate-limit", async () => {
+  const result = await getRateLimit(apikey, baseUrl);
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
 
 // Start receiving messages on stdin and sending messages on stdout
 const transport = new StdioServerTransport();

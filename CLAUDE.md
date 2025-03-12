@@ -181,6 +181,24 @@ This project uses the Model Context Protocol SDK. Follow its conventions when ex
 | `get-list-of-pull-request-attachments` | GET /api/v2/projects/:projectIdOrKey/git/repositories/:repoIdOrName/pullRequests/:number/attachments | Gets list of pull request attachments | `projectIdOrKey` (required), `repoIdOrName` (required), `number` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-list-of-pull-request-attachments) |
 | `download-pull-request-attachment` | GET /api/v2/projects/:projectIdOrKey/git/repositories/:repoIdOrName/pullRequests/:number/attachments/:attachmentId | Downloads a pull request attachment | `projectIdOrKey` (required), `repoIdOrName` (required), `number` (required), `attachmentId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/download-pull-request-attachment) |
 | `delete-pull-request-attachments` | DELETE /api/v2/projects/:projectIdOrKey/git/repositories/:repoIdOrName/pullRequests/:number/attachments/:attachmentId | Deletes a pull request attachment | `projectIdOrKey` (required), `repoIdOrName` (required), `number` (required), `attachmentId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/delete-pull-request-attachments) |
+| `get-watching-list` | GET /api/v2/users/:userId/watchings | Gets the list of watchings for a user | `userId` (required), `count` (optional), `order` (optional), `offset` (optional), `resourceAlreadyRead` (optional), `alreadyRead` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-watching-list) |
+| `count-watching` | GET /api/v2/users/:userId/watchings/count | Gets the count of watchings for a user | `userId` (required), `resourceAlreadyRead` (optional), `alreadyRead` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/count-watching) |
+| `get-watching` | GET /api/v2/watchings/:watchingId | Gets a specific watching | `watchingId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-watching) |
+| `add-watching` | POST /api/v2/watchings | Adds a watching to an issue | `issueIdOrKey` (required), `note` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/add-watching) |
+| `update-watching` | PATCH /api/v2/watchings/:watchingId | Updates a watching | `watchingId` (required), `note` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/update-watching) |
+| `delete-watching` | DELETE /api/v2/watchings/:watchingId | Deletes a watching | `watchingId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/delete-watching) |
+| `mark-watching-as-read` | POST /api/v2/watchings/:watchingId/markAsRead | Marks a watching as read | `watchingId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/mark-watching-as-read) |
+| `get-licence` | GET /api/v2/space/licence | Gets the license information | None | [Link](https://developer.nulab.com/docs/backlog/api/2/get-licence) |
+| `get-list-of-teams` | GET /api/v2/teams | Gets the list of teams | `offset` (optional), `count` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-list-of-teams) |
+| `add-team` | POST /api/v2/teams | Adds a team | `name` (required), `members` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/add-team) |
+| `get-team` | GET /api/v2/teams/:teamId | Gets a team | `teamId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-team) |
+| `update-team` | PATCH /api/v2/teams/:teamId | Updates a team | `teamId` (required), `name` (optional), `members` (optional) | [Link](https://developer.nulab.com/docs/backlog/api/2/update-team) |
+| `delete-team` | DELETE /api/v2/teams/:teamId | Deletes a team | `teamId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/delete-team) |
+| `get-team-icon` | GET /api/v2/teams/:teamId/icon | Gets a team icon | `teamId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-team-icon) |
+| `get-project-team-list` | GET /api/v2/projects/:projectIdOrKey/teams | Gets the list of teams in a project | `projectIdOrKey` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/get-project-team-list) |
+| `add-project-team` | POST /api/v2/projects/:projectIdOrKey/teams | Adds a team to a project | `projectIdOrKey` (required), `teamId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/add-project-team) |
+| `delete-project-team` | DELETE /api/v2/projects/:projectIdOrKey/teams/:teamId | Removes a team from a project | `projectIdOrKey` (required), `teamId` (required) | [Link](https://developer.nulab.com/docs/backlog/api/2/delete-project-team) |
+| `get-rate-limit` | GET /api/v2/rateLimit | Gets the API rate limit information | None | [Link](https://developer.nulab.com/docs/backlog/api/2/get-rate-limit) |
 
 ### Implementation Pattern
 

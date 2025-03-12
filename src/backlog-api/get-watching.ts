@@ -1,0 +1,38 @@
+import axios from 'axios';
+
+/**
+ * Gets a specific watching by ID
+ * @param apiKey API key for authentication
+ * @param baseUrl Backlog base URL (e.g., 'example.backlog.com')
+ * @param watchingId Watching ID
+ * @returns Details of the specified watching
+ * @see https://developer.nulab.com/docs/backlog/api/2/get-watching
+ */
+export async function getWatching(
+  apiKey: string,
+  baseUrl: string,
+  watchingId: number
+) {
+  if (!apiKey) throw new Error('apiKey is required');
+  if (!baseUrl) throw new Error('baseUrl is required');
+  if (!watchingId) throw new Error('watchingId is required');
+
+  try {
+    const response = await axios.get(`https://${baseUrl}/api/v2/watchings/${watchingId}`, {
+      params: {
+        apiKey
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        `Failed to get watching: ${error.response.status} ${
+          error.response.data.message || error.message
+        }`
+      );
+    }
+    throw new Error(`Failed to get watching: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
