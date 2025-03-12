@@ -93,6 +93,22 @@ import { getIssueParticipantList } from "./backlog-api/get-issue-participant-lis
 import { getListOfLinkedSharedFiles } from "./backlog-api/get-list-of-linked-shared-files";
 import { linkSharedFilesToIssue } from "./backlog-api/link-shared-files-to-issue";
 import { removeLinkToSharedFileFromIssue } from "./backlog-api/remove-link-to-shared-file-from-issue";
+import { getWikiPageList } from "./backlog-api/get-wiki-page-list";
+import { countWikiPage } from "./backlog-api/count-wiki-page";
+import { getWikiPageTagList } from "./backlog-api/get-wiki-page-tag-list";
+import { addWikiPage } from "./backlog-api/add-wiki-page";
+import { getWikiPage } from "./backlog-api/get-wiki-page";
+import { updateWikiPage } from "./backlog-api/update-wiki-page";
+import { deleteWikiPage } from "./backlog-api/delete-wiki-page";
+import { getListOfWikiAttachments } from "./backlog-api/get-list-of-wiki-attachments";
+import { attachFileToWiki } from "./backlog-api/attach-file-to-wiki";
+import { getWikiPageAttachment } from "./backlog-api/get-wiki-page-attachment";
+import { removeWikiAttachment } from "./backlog-api/remove-wiki-attachment";
+import { getListOfSharedFilesOnWiki } from "./backlog-api/get-list-of-shared-files-on-wiki";
+import { linkSharedFilesToWiki } from "./backlog-api/link-shared-files-to-wiki";
+import { removeLinkToSharedFileFromWiki } from "./backlog-api/remove-link-to-shared-file-from-wiki";
+import { getWikiPageHistory } from "./backlog-api/get-wiki-page-history";
+import { getWikiPageStar } from "./backlog-api/get-wiki-page-star";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -2870,6 +2886,462 @@ server.tool(
       baseUrl,
       params.issueIdOrKey,
       params.fileId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page List Tool
+server.tool(
+  "get-wiki-page-list",
+  { 
+    projectIdOrKey: z.union([z.string(), z.number()]).optional(),
+    keyword: z.string().optional(),
+    count: z.number().optional(),
+    offset: z.number().optional()
+  },
+  async (params: { 
+    projectIdOrKey?: string | number; 
+    keyword?: string;
+    count?: number;
+    offset?: number;
+  }) => {
+    const result = await getWikiPageList(
+      apikey,
+      baseUrl,
+      {
+        projectIdOrKey: params.projectIdOrKey,
+        keyword: params.keyword,
+        count: params.count,
+        offset: params.offset,
+      }
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Count Wiki Page Tool
+server.tool(
+  "count-wiki-page",
+  { projectIdOrKey: z.union([z.string(), z.number()]).optional() },
+  async (params: { projectIdOrKey?: string | number }) => {
+    const result = await countWikiPage(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page Tag List Tool
+server.tool(
+  "get-wiki-page-tag-list",
+  { projectIdOrKey: z.union([z.string(), z.number()]).optional() },
+  async (params: { projectIdOrKey?: string | number }) => {
+    const result = await getWikiPageTagList(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Add Wiki Page Tool
+server.tool(
+  "add-wiki-page",
+  { 
+    projectId: z.number(),
+    name: z.string(),
+    content: z.string(),
+    mailNotify: z.boolean().optional(),
+    tags: z.array(z.string()).optional()
+  },
+  async (params: { 
+    projectId: number; 
+    name: string;
+    content: string;
+    mailNotify?: boolean;
+    tags?: string[];
+  }) => {
+    if (!params.projectId) {
+      throw new Error("Project ID is required");
+    }
+    if (!params.name) {
+      throw new Error("Wiki page name is required");
+    }
+    if (!params.content) {
+      throw new Error("Wiki page content is required");
+    }
+
+    const result = await addWikiPage(
+      apikey,
+      baseUrl,
+      params.projectId,
+      params.name,
+      params.content,
+      {
+        mailNotify: params.mailNotify,
+        tags: params.tags,
+      }
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page Tool
+server.tool(
+  "get-wiki-page",
+  { wikiId: z.number() },
+  async (params: { wikiId: number }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await getWikiPage(
+      apikey,
+      baseUrl,
+      params.wikiId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Update Wiki Page Tool
+server.tool(
+  "update-wiki-page",
+  { 
+    wikiId: z.number(),
+    name: z.string().optional(),
+    content: z.string().optional(),
+    mailNotify: z.boolean().optional(),
+    tags: z.array(z.string()).optional()
+  },
+  async (params: { 
+    wikiId: number; 
+    name?: string;
+    content?: string;
+    mailNotify?: boolean;
+    tags?: string[];
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await updateWikiPage(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      {
+        name: params.name,
+        content: params.content,
+        mailNotify: params.mailNotify,
+        tags: params.tags,
+      }
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Delete Wiki Page Tool
+server.tool(
+  "delete-wiki-page",
+  { 
+    wikiId: z.number(),
+    mailNotify: z.boolean().optional()
+  },
+  async (params: { 
+    wikiId: number;
+    mailNotify?: boolean;
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await deleteWikiPage(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.mailNotify
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Wiki Attachments Tool
+server.tool(
+  "get-list-of-wiki-attachments",
+  { wikiId: z.number() },
+  async (params: { wikiId: number }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await getListOfWikiAttachments(
+      apikey,
+      baseUrl,
+      params.wikiId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Attach File to Wiki Tool
+server.tool(
+  "attach-file-to-wiki",
+  { 
+    wikiId: z.number(),
+    attachmentId: z.number()
+  },
+  async (params: { 
+    wikiId: number;
+    attachmentId: number;
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+
+    const result = await attachFileToWiki(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.attachmentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page Attachment Tool
+server.tool(
+  "get-wiki-page-attachment",
+  { 
+    wikiId: z.number(),
+    attachmentId: z.number()
+  },
+  async (params: { 
+    wikiId: number;
+    attachmentId: number;
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+
+    const result = await getWikiPageAttachment(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.attachmentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Remove Wiki Attachment Tool
+server.tool(
+  "remove-wiki-attachment",
+  { 
+    wikiId: z.number(),
+    attachmentId: z.number()
+  },
+  async (params: { 
+    wikiId: number;
+    attachmentId: number;
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+
+    const result = await removeWikiAttachment(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.attachmentId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get List of Shared Files on Wiki Tool
+server.tool(
+  "get-list-of-shared-files-on-wiki",
+  { wikiId: z.number() },
+  async (params: { wikiId: number }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await getListOfSharedFilesOnWiki(
+      apikey,
+      baseUrl,
+      params.wikiId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Link Shared Files to Wiki Tool
+server.tool(
+  "link-shared-files-to-wiki",
+  { 
+    wikiId: z.number(),
+    fileIds: z.array(z.number())
+  },
+  async (params: { 
+    wikiId: number;
+    fileIds: number[];
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+    if (!params.fileIds || params.fileIds.length === 0) {
+      throw new Error("At least one file ID is required");
+    }
+
+    const result = await linkSharedFilesToWiki(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.fileIds
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Remove Link to Shared File from Wiki Tool
+server.tool(
+  "remove-link-to-shared-file-from-wiki",
+  { 
+    wikiId: z.number(),
+    fileId: z.number()
+  },
+  async (params: { 
+    wikiId: number;
+    fileId: number;
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+    if (!params.fileId) {
+      throw new Error("File ID is required");
+    }
+
+    const result = await removeLinkToSharedFileFromWiki(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      params.fileId
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page History Tool
+server.tool(
+  "get-wiki-page-history",
+  { 
+    wikiId: z.number(),
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["asc", "desc"]).optional()
+  },
+  async (params: { 
+    wikiId: number;
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "asc" | "desc";
+  }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await getWikiPageHistory(
+      apikey,
+      baseUrl,
+      params.wikiId,
+      {
+        minId: params.minId,
+        maxId: params.maxId,
+        count: params.count,
+        order: params.order,
+      }
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  }
+);
+
+// Get Wiki Page Star Tool
+server.tool(
+  "get-wiki-page-star",
+  { wikiId: z.number() },
+  async (params: { wikiId: number }) => {
+    if (!params.wikiId) {
+      throw new Error("Wiki ID is required");
+    }
+
+    const result = await getWikiPageStar(
+      apikey,
+      baseUrl,
+      params.wikiId
     );
 
     return {
