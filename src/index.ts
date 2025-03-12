@@ -109,6 +109,24 @@ import { linkSharedFilesToWiki } from "./backlog-api/link-shared-files-to-wiki";
 import { removeLinkToSharedFileFromWiki } from "./backlog-api/remove-link-to-shared-file-from-wiki";
 import { getWikiPageHistory } from "./backlog-api/get-wiki-page-history";
 import { getWikiPageStar } from "./backlog-api/get-wiki-page-star";
+import { addStar } from "./backlog-api/add-star";
+import { countNotification } from "./backlog-api/count-notification";
+import { getNotificationList } from "./backlog-api/get-notification-list";
+import { resetUnreadNotificationCount } from "./backlog-api/reset-unread-notification-count";
+import { getListOfGitRepositories } from "./backlog-api/get-list-of-git-repositories";
+import { getGitRepository } from "./backlog-api/get-git-repository";
+import { getPullRequestList } from "./backlog-api/get-pull-request-list";
+import { getNumberOfPullRequests } from "./backlog-api/get-number-of-pull-requests";
+import { addPullRequest } from "./backlog-api/add-pull-request";
+import { updatePullRequest } from "./backlog-api/update-pull-request";
+import { getPullRequest } from "./backlog-api/get-pull-request";
+import { addPullRequestComment } from "./backlog-api/add-pull-request-comment";
+import { getPullRequestComment } from "./backlog-api/get-pull-request-comment";
+import { getNumberOfPullRequestComments } from "./backlog-api/get-number-of-pull-request-comments";
+import { updatePullRequestCommentInformation } from "./backlog-api/update-pull-request-comment-information";
+import { getListOfPullRequestAttachments } from "./backlog-api/get-list-of-pull-request-attachments";
+import { downloadPullRequestAttachment } from "./backlog-api/download-pull-request-attachment";
+import { deletePullRequestAttachments } from "./backlog-api/delete-pull-request-attachments";
 
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
@@ -3348,6 +3366,709 @@ server.tool(
       content: [{ type: "text", text: JSON.stringify(result) }],
     };
   }
+);
+
+// Add Star Tool
+server.tool(
+  "add-star",
+  {
+    issueId: z.number().optional(),
+    commentId: z.number().optional(),
+    wikiId: z.number().optional(),
+    pullRequestId: z.number().optional(),
+    pullRequestCommentId: z.number().optional(),
+  },
+  async (params: {
+    issueId?: number;
+    commentId?: number;
+    wikiId?: number;
+    pullRequestId?: number;
+    pullRequestCommentId?: number;
+  }) => {
+    if (!params.issueId && !params.commentId && !params.wikiId && !params.pullRequestId && !params.pullRequestCommentId) {
+      throw new Error("At least one of issueId, commentId, wikiId, pullRequestId, or pullRequestCommentId is required");
+    }
+
+    const result = await addStar(
+      apikey,
+      baseUrl,
+      params,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Count Notification Tool
+server.tool(
+  "count-notification",
+  {
+    alreadyRead: z.boolean().optional(),
+  },
+  async (params: { alreadyRead?: boolean }) => {
+    const result = await countNotification(
+      apikey,
+      baseUrl,
+      params,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Notification List Tool
+server.tool(
+  "get-notification-list",
+  {
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["asc", "desc"]).optional(),
+  },
+  async (params: {
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "asc" | "desc";
+  }) => {
+    const result = await getNotificationList(
+      apikey,
+      baseUrl,
+      params,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Reset Unread Notification Count Tool
+server.tool("reset-unread-notification-count", async () => {
+  const result = await resetUnreadNotificationCount(
+    apikey,
+    baseUrl,
+  );
+
+  return {
+    content: [{ type: "text", text: JSON.stringify(result) }],
+  };
+});
+
+// Get List of Git Repositories Tool
+server.tool(
+  "get-list-of-git-repositories",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+  },
+  async (params: { projectIdOrKey: string | number }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+
+    const result = await getListOfGitRepositories(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Git Repository Tool
+server.tool(
+  "get-git-repository",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+
+    const result = await getGitRepository(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Pull Request List Tool
+server.tool(
+  "get-pull-request-list",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    statusId: z.array(z.number()).optional(),
+    assigneeId: z.array(z.number()).optional(),
+    issueId: z.array(z.number()).optional(),
+    createdUserId: z.array(z.number()).optional(),
+    offset: z.number().optional(),
+    count: z.number().optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    statusId?: number[];
+    assigneeId?: number[];
+    issueId?: number[];
+    createdUserId?: number[];
+    offset?: number;
+    count?: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, ...options } = params;
+    
+    const result = await getPullRequestList(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Number of Pull Requests Tool
+server.tool(
+  "get-number-of-pull-requests",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    statusId: z.array(z.number()).optional(),
+    assigneeId: z.array(z.number()).optional(),
+    issueId: z.array(z.number()).optional(),
+    createdUserId: z.array(z.number()).optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    statusId?: number[];
+    assigneeId?: number[];
+    issueId?: number[];
+    createdUserId?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, ...options } = params;
+    
+    const result = await getNumberOfPullRequests(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Add Pull Request Tool
+server.tool(
+  "add-pull-request",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    summary: z.string(),
+    description: z.string(),
+    base: z.string(),
+    branch: z.string(),
+    issueId: z.number().optional(),
+    assigneeId: z.number().optional(),
+    notifiedUserId: z.array(z.number()).optional(),
+    attachmentId: z.array(z.number()).optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    summary: string;
+    description: string;
+    base: string;
+    branch: string;
+    issueId?: number;
+    assigneeId?: number;
+    notifiedUserId?: number[];
+    attachmentId?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.summary) {
+      throw new Error("Summary is required");
+    }
+    if (!params.description) {
+      throw new Error("Description is required");
+    }
+    if (!params.base) {
+      throw new Error("Base branch is required");
+    }
+    if (!params.branch) {
+      throw new Error("Feature branch is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, summary, description, base, branch, ...options } = params;
+    
+    const result = await addPullRequest(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      summary,
+      description,
+      base,
+      branch,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Update Pull Request Tool
+server.tool(
+  "update-pull-request",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    summary: z.string().optional(),
+    description: z.string().optional(),
+    issueId: z.number().optional(),
+    assigneeId: z.number().optional(),
+    statusId: z.number().optional(),
+    repositoryId: z.number().optional(),
+    baseId: z.number().optional(),
+    branchId: z.number().optional(),
+    notifiedUserId: z.array(z.number()).optional(),
+    attachmentId: z.array(z.number()).optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    summary?: string;
+    description?: string;
+    issueId?: number;
+    assigneeId?: number;
+    statusId?: number;
+    repositoryId?: number;
+    baseId?: number;
+    branchId?: number;
+    notifiedUserId?: number[];
+    attachmentId?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, number, ...options } = params;
+    
+    const result = await updatePullRequest(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      number,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Pull Request Tool
+server.tool(
+  "get-pull-request",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    
+    const result = await getPullRequest(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Add Pull Request Comment Tool
+server.tool(
+  "add-pull-request-comment",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    content: z.string(),
+    notifiedUserId: z.array(z.number()).optional(),
+    attachmentId: z.array(z.number()).optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    content: string;
+    notifiedUserId?: number[];
+    attachmentId?: number[];
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    if (!params.content) {
+      throw new Error("Content is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, number, content, ...options } = params;
+    
+    const result = await addPullRequestComment(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      number,
+      content,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Pull Request Comment Tool
+server.tool(
+  "get-pull-request-comment",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    minId: z.number().optional(),
+    maxId: z.number().optional(),
+    count: z.number().optional(),
+    order: z.enum(["asc", "desc"]).optional(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    minId?: number;
+    maxId?: number;
+    count?: number;
+    order?: "asc" | "desc";
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+
+    const { projectIdOrKey, repoIdOrName, number, ...options } = params;
+    
+    const result = await getPullRequestComment(
+      apikey,
+      baseUrl,
+      projectIdOrKey,
+      repoIdOrName,
+      number,
+      options,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get Number of Pull Request Comments Tool
+server.tool(
+  "get-number-of-pull-request-comments",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    
+    const result = await getNumberOfPullRequestComments(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Update Pull Request Comment Information Tool
+server.tool(
+  "update-pull-request-comment-information",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    commentId: z.number(),
+    content: z.string(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    commentId: number;
+    content: string;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    if (!params.commentId) {
+      throw new Error("Comment ID is required");
+    }
+    if (!params.content) {
+      throw new Error("Content is required");
+    }
+    
+    const result = await updatePullRequestCommentInformation(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+      params.commentId,
+      params.content,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Get List of Pull Request Attachments Tool
+server.tool(
+  "get-list-of-pull-request-attachments",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    
+    const result = await getListOfPullRequestAttachments(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Download Pull Request Attachment Tool
+server.tool(
+  "download-pull-request-attachment",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    attachmentId: z.number(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    attachmentId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+    
+    const result = await downloadPullRequestAttachment(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+      params.attachmentId,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+// Delete Pull Request Attachments Tool
+server.tool(
+  "delete-pull-request-attachments",
+  {
+    projectIdOrKey: z.union([z.string(), z.number()]),
+    repoIdOrName: z.union([z.string(), z.number()]),
+    number: z.number(),
+    attachmentId: z.number(),
+  },
+  async (params: {
+    projectIdOrKey: string | number;
+    repoIdOrName: string | number;
+    number: number;
+    attachmentId: number;
+  }) => {
+    if (!params.projectIdOrKey) {
+      throw new Error("Project ID or key is required");
+    }
+    if (!params.repoIdOrName) {
+      throw new Error("Repository ID or name is required");
+    }
+    if (!params.number) {
+      throw new Error("Pull request number is required");
+    }
+    if (!params.attachmentId) {
+      throw new Error("Attachment ID is required");
+    }
+    
+    const result = await deletePullRequestAttachments(
+      apikey,
+      baseUrl,
+      params.projectIdOrKey,
+      params.repoIdOrName,
+      params.number,
+      params.attachmentId,
+    );
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
 );
 
 // Start receiving messages on stdin and sending messages on stdout
