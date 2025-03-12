@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
+    "@rushstack/ts-command-line": "^4.23.6",
     "axios": "^1.8.2",
     "lodash": "^4.17.21"
   },
