@@ -145,15 +145,66 @@ import { updatePullRequestCommentInformation } from "./backlog-api/update-pull-r
 import { getListOfPullRequestAttachments } from "./backlog-api/get-list-of-pull-request-attachments";
 import { downloadPullRequestAttachment } from "./backlog-api/download-pull-request-attachment";
 import { deletePullRequestAttachments } from "./backlog-api/delete-pull-request-attachments";
-import { checkPermissionThenRegister } from "./check-role-and-permission-then-register";
-import { Role } from "./role";
+import { checkPermissionThenRegister } from "./check-permission-then-register";
 import { Permission } from "./permission";
 import { getValidatedArgs } from "./validate-args";
 
+import {
+  CommandLineChoiceParameter,
+  CommandLineParser,
+  CommandLineStringParameter,
+} from "@rushstack/ts-command-line";
+
+// Create a command-line parser
+class BacklogCommandLine extends CommandLineParser {
+  private _permissionParam!: CommandLineChoiceParameter;
+
+  public constructor() {
+    super({
+      toolFilename: "backlog",
+      toolDescription: "Backlog MCP Server",
+    });
+
+    this._permissionParam = this.defineChoiceParameter({
+      parameterLongName: "--permission",
+      parameterShortName: "-p",
+      alternatives: ["READ", "MUTATE"],
+      defaultValue: "READ",
+      description: "Sets the permission level (READ or MUTATE)",
+      required: false,
+    });
+  }
+
+  public getPermission(): string | undefined {
+    return this._permissionParam.value;
+  }
+}
+
+// Parse command line
+const commandLine = new BacklogCommandLine();
+commandLine.execute();
+
 const apikey = loadApiKey(path.join(__dirname, "../apikey"));
 const baseUrl = "yourstand.backlog.com";
+// Determine permission source and value
+const cliPermission = commandLine.getPermission();
+console.log("🔴 cliPermission", cliPermission);
+const envPermission = process.env.MCP_BACKLOG_SERVER_PERMISSION;
+const permissionValue = cliPermission || envPermission;
+
+// Log the permission source for better debugging
+if (cliPermission) {
+  console.log(`Using permission from CLI flag: ${cliPermission}`);
+} else if (envPermission) {
+  console.log(`Using permission from environment variable: ${envPermission}`);
+} else {
+  console.log(
+    "No permission specified. Validation will fail unless a default is provided.",
+  );
+}
+
 const args = {
-  permission: process.env.MCP_BACKLOG_SERVER_PERMISSION,
+  permission: permissionValue,
 };
 const actual = getValidatedArgs(args);
 
