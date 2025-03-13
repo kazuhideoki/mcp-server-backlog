@@ -11,8 +11,8 @@
 
 Set Backlog Api Key to `apikey`
 
-```
-claude mcp add backlog node /path/to/mcp-server-backlog/dist/index.js
+```sh
+claude mcp add backlog export MCP_BACKLOG_SERVER_PERMISSION=READ; node /path/to/mcp-server-backlog/dist/index.js
 ```
 
 ## 対応エンドポイント構造化
