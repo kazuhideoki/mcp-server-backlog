@@ -12,6 +12,13 @@
 
 Set Backlog Api Key to `apikey` file in the project root.
 
+### Dependencies install & Build
+
+```sh
+npm install
+npm run build
+```
+
 ### Add MCP Server to Claude Code
 
 ```sh
