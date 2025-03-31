@@ -12,7 +12,7 @@
 
 Set Backlog Api Key to `apikey` file in the project root.
 
-### Install & build
+### Dependencies install & Build
 
 ```sh
 npm install
