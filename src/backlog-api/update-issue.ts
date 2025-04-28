@@ -56,61 +56,61 @@ export async function updateIssue(
 ) {
   try {
     const params = { apiKey };
-    
-    const { 
+
+    const {
       categoryId,
       versionId,
       milestoneId,
       notifiedUserId,
       attachmentId,
       customFields = {},
-      ...standardOptions 
+      ...standardOptions
     } = options;
-    
+
     // Initialize formData with standard options
     let formData: Record<string, any> = {
-      ...standardOptions
+      ...standardOptions,
     };
-    
+
     // Add array fields if they exist
     if (categoryId?.length) {
       categoryId.forEach((id, i) => {
         formData[`categoryId[${i}]`] = id;
       });
     }
-    
+
     if (versionId?.length) {
       versionId.forEach((id, i) => {
         formData[`versionId[${i}]`] = id;
       });
     }
-    
+
     if (milestoneId?.length) {
       milestoneId.forEach((id, i) => {
         formData[`milestoneId[${i}]`] = id;
       });
     }
-    
+
     if (notifiedUserId?.length) {
       notifiedUserId.forEach((id, i) => {
         formData[`notifiedUserId[${i}]`] = id;
       });
     }
-    
+
     if (attachmentId?.length) {
       attachmentId.forEach((id, i) => {
         formData[`attachmentId[${i}]`] = id;
       });
     }
-    
+
     // Add custom fields
     Object.entries(customFields).forEach(([key, value]) => {
       formData[key] = value;
     });
-    
+
     // Remove null/undefined values
     formData = _.omitBy(formData, _.isNil);
-    
+
     // Return early if no update parameters provided
     if (Object.keys(formData).length === 0) {
       throw new Error("At least one update parameter must be provided");
@@ -122,7 +122,7 @@ export async function updateIssue(
       {
         params,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       },
     );

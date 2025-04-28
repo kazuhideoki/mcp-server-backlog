@@ -12,23 +12,25 @@
 
 Set Backlog Api Key to `apikey` file in the project root.
 
-### Running the Server
-
-You can run the server in two ways:
-
-1. Using environment variables:
+### Dependencies install & Build
 
 ```sh
-claude mcp add backlog node /path/to/mcp-server-backlog/dist/index.js --permission READ
+npm install
+npm run build
 ```
 
-2. Using command line flags:
+### Add MCP Server to Claude Code
+
+```sh
+claude mcp add backlog node /path/to/mcp-server-backlog/dist/index.js -- --permission READ
+```
+
+### Running the Server
 
 ```sh
 # Development mode with permission flag
 npm run dev -- --permission READ
-
-# Production mode with permission flag
+# Production mode with permission flag (after build)
 node /path/to/mcp-server-backlog/dist/index.js --permission READ
 ```
 
