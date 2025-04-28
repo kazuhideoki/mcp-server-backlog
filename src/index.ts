@@ -446,20 +446,38 @@ checkPermissionThenRegister(
         summary: z.string(),
         issueTypeId: z.number(),
         priorityId: z.number(),
+        parentIssueId: z.number().optional(),
         description: z.string().optional(),
         startDate: z.string().optional(),
         dueDate: z.string().optional(),
+        estimatedHours: z.number().optional(),
+        actualHours: z.number().optional(),
+        categoryId: z.array(z.number()).optional(),
+        versionId: z.array(z.number()).optional(),
+        milestoneId: z.array(z.number()).optional(),
         assigneeId: z.number().optional(),
+        notifiedUserId: z.array(z.number()).optional(),
+        attachmentId: z.array(z.number()).optional(),
+        customFields: z.record(z.string(), z.any()).optional(),
       },
       async (params: {
         projectId: number;
         summary: string;
         issueTypeId: number;
         priorityId: number;
+        parentIssueId?: number;
         description?: string;
         startDate?: string;
         dueDate?: string;
+        estimatedHours?: number;
+        actualHours?: number;
+        categoryId?: number[];
+        versionId?: number[];
+        milestoneId?: number[];
         assigneeId?: number;
+        notifiedUserId?: number[];
+        attachmentId?: number[];
+        customFields?: Record<string, any>;
       }) => {
         if (
           !params.projectId ||
@@ -504,22 +522,46 @@ checkPermissionThenRegister(
       {
         issueId: z.union([z.string(), z.number()]),
         summary: z.string().optional(),
+        parentIssueId: z.number().optional(),
         description: z.string().optional(),
         statusId: z.number().optional(),
-        priorityId: z.number().optional(),
-        assigneeId: z.number().optional(),
+        resolutionId: z.number().optional(),
         startDate: z.string().optional(),
         dueDate: z.string().optional(),
+        estimatedHours: z.number().optional(),
+        actualHours: z.number().optional(),
+        issueTypeId: z.number().optional(),
+        categoryId: z.array(z.number()).optional(),
+        versionId: z.array(z.number()).optional(),
+        milestoneId: z.array(z.number()).optional(),
+        priorityId: z.number().optional(),
+        assigneeId: z.number().optional(),
+        notifiedUserId: z.array(z.number()).optional(),
+        attachmentId: z.array(z.number()).optional(),
+        comment: z.string().optional(),
+        customFields: z.record(z.string(), z.any()).optional(),
       },
       async (params: {
         issueId: string | number;
         summary?: string;
+        parentIssueId?: number;
         description?: string;
         statusId?: number;
-        priorityId?: number;
-        assigneeId?: number;
+        resolutionId?: number;
         startDate?: string;
         dueDate?: string;
+        estimatedHours?: number;
+        actualHours?: number;
+        issueTypeId?: number;
+        categoryId?: number[];
+        versionId?: number[];
+        milestoneId?: number[];
+        priorityId?: number;
+        assigneeId?: number;
+        notifiedUserId?: number[];
+        attachmentId?: number[];
+        comment?: string;
+        customFields?: Record<string, any>;
       }) => {
         if (!params.issueId) {
           throw new Error("Issue ID is required");
