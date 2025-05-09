@@ -7,11 +7,11 @@ import { getSpaceLogo } from "./backlog-api/get-space-logo";
 import { getSpaceNotification } from "./backlog-api/get-space-notification";
 import { updateSpaceNotification } from "./backlog-api/update-space-notification";
 import { getSpaceDiskUsage } from "./backlog-api/get-space-disk-usage";
-import { getUsers } from "./backlog-api/get-users";
+import { getIssueList, GetIssueListParams } from "./backlog-api/get-issue-list";
 import { getUser } from "./backlog-api/get-user";
+import { getUsers } from "./backlog-api/get-users";
 import { deleteUser } from "./backlog-api/delete-user";
 import { getProjects } from "./backlog-api/get-projects";
-import { getIssues } from "./backlog-api/get-issues";
 import { createIssue } from "./backlog-api/add-issue";
 import { updateIssue } from "./backlog-api/update-issue";
 import { postAttachmentFile } from "./backlog-api/post-attachment-file";
@@ -409,22 +409,40 @@ checkPermissionThenRegister(
   },
   () =>
     server.tool(
-      "get-issues",
+      "get-issue-list",
       {
         projectId: z.array(z.number()).optional(),
+        issueTypeId: z.array(z.number()).optional(),
+        categoryId: z.array(z.number()).optional(),
+        versionId: z.array(z.number()).optional(),
+        milestoneId: z.array(z.number()).optional(),
         statusId: z.array(z.number()).optional(),
+        priorityId: z.array(z.number()).optional(),
         assigneeId: z.array(z.number()).optional(),
-        count: z.number().optional(),
+        createdUserId: z.array(z.number()).optional(),
+        resolutionId: z.array(z.number()).optional(),
+        parentChild: z.number().optional(),
+        attachment: z.boolean().optional(),
+        sharedFile: z.boolean().optional(),
+        sort: z.string().optional(),
+        order: z.enum(["asc", "desc"]).optional(),
         offset: z.number().optional(),
+        count: z.number().optional(),
+        createdSince: z.string().optional(),
+        createdUntil: z.string().optional(),
+        updatedSince: z.string().optional(),
+        updatedUntil: z.string().optional(),
+        startDateSince: z.string().optional(),
+        startDateUntil: z.string().optional(),
+        dueDateSince: z.string().optional(),
+        dueDateUntil: z.string().optional(),
+        id: z.array(z.number()).optional(),
+        parentIssueId: z.array(z.number()).optional(),
+        keyword: z.string().optional(),
+        // カスタムフィールドは柔軟なため、バリデーションは省略
       },
-      async (params: {
-        projectId?: number[];
-        statusId?: number[];
-        assigneeId?: number[];
-        count?: number;
-        offset?: number;
-      }) => {
-        const result = await getIssues(apikey, baseUrl, params);
+      async (params: GetIssueListParams) => {
+        const result = await getIssueList(apikey, baseUrl, params);
         return {
           content: [{ type: "text", text: JSON.stringify(result) }],
         };
